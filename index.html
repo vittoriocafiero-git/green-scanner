@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>GREEN FINDER</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- DESKTOP BLOCK -->
+  <div id="desktop-block">
+    <div class="desktop-inner">
+      <div class="desktop-icon">
+        <svg viewBox="0 0 60 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M26 0 L26 8 C18 10 14 18 14 26 L14 100 C14 108 20 114 28 114 L32 114 C40 114 46 108 46 100 L46 26 C46 18 42 10 34 8 L34 0 Z" stroke="#00FF00" stroke-width="2" fill="none"/>
+        </svg>
+      </div>
+      <h1>GREEN FINDER</h1>
+      <p>This experience is designed for mobile devices only.</p>
+      <p>Open this page on your smartphone to start scanning.</p>
+      <div class="qr-hint">
+        <span class="blink">[ MOBILE ONLY ]</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE APP -->
+  <div id="app">
+
+    <!-- LANDING STATE -->
+    <div id="landing">
+      <div class="grid-overlay"></div>
+
+      <div class="landing-top">
+        <span class="sys-label">GRN_SCAN v2.1</span>
+        <span class="sys-label">INIT:READY</span>
+      </div>
+
+      <div class="bottle-hero">
+        <svg id="hero-bottle" viewBox="0 0 80 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M34 0 L34 30 C22 34 16 46 16 58 L16 178 C16 190 24 198 34 198 L46 198 C56 198 64 190 64 178 L64 58 C64 46 58 34 46 30 L46 0 Z"
+                stroke="#00FF00" stroke-width="1.5" fill="none" opacity="0.9"/>
+          <line x1="40" y1="0" x2="40" y2="200" stroke="#00FF00" stroke-width="0.4" opacity="0.3"/>
+          <line x1="16" y1="100" x2="64" y2="100" stroke="#00FF00" stroke-width="0.4" opacity="0.3"/>
+        </svg>
+      </div>
+
+      <div class="landing-title">
+        <h1>GREEN <span class="gap"></span> FINDER</h1>
+        <p class="subtitle">HOW GREEN IS YOUR WORLD?</p>
+      </div>
+
+      <div class="status-bar">
+        <span class="status-dot"></span>
+        <span class="status-text">SYS:READY</span>
+        <span class="sep">•</span>
+        <span class="status-text">CAM:STANDBY</span>
+      </div>
+
+      <button id="start-btn" onclick="startScanner()">
+        <svg class="scan-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 8V5a1 1 0 0 1 1-1h3M4 16v3a1 1 0 0 0 1 1h3M16 4h3a1 1 0 0 1 1 1v3M16 20h3a1 1 0 0 0 1-1v-3" stroke="#000" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        START SCANNING
+      </button>
+
+      <div class="corner-data corner-bl">LAT:0.000<br>LON:0.000</div>
+      <div class="corner-data corner-br">SIG:----</div>
+    </div>
+
+    <!-- SCANNER STATE -->
+    <div id="scanner" class="hidden">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="offscreen" style="display:none;"></canvas>
+
+      <!-- HUD overlays -->
+      <div class="hud-grid"></div>
+
+      <!-- Scan line -->
+      <div id="scan-line"></div>
+
+      <!-- Bottle mask container -->
+      <div id="bottle-mask-container">
+        <svg id="bottle-svg" viewBox="0 0 200 500" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="bottleClip">
+              <path id="bottle-path" d="M85 0 L85 75 C55 85 40 115 40 145 L40 445 C40 475 60 495 85 495 L115 495 C140 495 160 475 160 445 L160 145 C160 115 145 85 115 75 L115 0 Z"/>
+            </clipPath>
+            <!-- Glow filter for the bottle outline -->
+            <filter id="glow" x="-30%" y="-5%" width="160%" height="110%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <!-- Glowing bottle outline -->
+          <path id="bottle-outline" d="M85 0 L85 75 C55 85 40 115 40 145 L40 445 C40 475 60 495 85 495 L115 495 C140 495 160 475 160 445 L160 145 C160 115 145 85 115 75 L115 0 Z"
+                fill="none" stroke="#00FF00" stroke-width="2.5"/>
+          <!-- Inner subtle lines -->
+          <line x1="100" y1="0" x2="100" y2="500" stroke="#00FF00" stroke-width="0.5" opacity="0.2"/>
+          <line x1="40" y1="250" x2="160" y2="250" stroke="#00FF00" stroke-width="0.5" opacity="0.2"/>
+          <!-- Corner brackets -->
+          <line x1="40" y1="145" x2="55" y2="145" stroke="#00FF00" stroke-width="1.5" opacity="0.8"/>
+          <line x1="40" y1="145" x2="40" y2="165" stroke="#00FF00" stroke-width="1.5" opacity="0.8"/>
+          <line x1="160" y1="145" x2="145" y2="145" stroke="#00FF00" stroke-width="1.5" opacity="0.8"/>
+          <line x1="160" y1="145" x2="160" y2="165" stroke="#00FF00" stroke-width="1.5" opacity="0.8"/>
+          <line x1="40" y1="445" x2="55" y2="445" stroke="#00FF00" stroke-width="1.5" opacity="0.8"/>
+          <line x1="40" y1="445" x2="40" y2="425" stroke="#00FF00" stroke-width="1.5" opacity="0.8"/>
+          <line x1="160" y1="445" x2="145" y2="445" stroke="#00FF00" stroke-width="1.5" opacity="0.8"/>
+          <line x1="160" y1="445" x2="160" y2="425" stroke="#00FF00" stroke-width="1.5" opacity="0.8"/>
+        </svg>
+      </div>
+
+      <!-- HUD corners -->
+      <div class="hud-corner tl"></div>
+      <div class="hud-corner tr"></div>
+      <div class="hud-corner bl"></div>
+      <div class="hud-corner br"></div>
+
+      <!-- Top HUD bar -->
+      <div class="hud-top">
+        <span class="hud-label blink">SCANNING...</span>
+      </div>
+
+      <!-- Percentage display -->
+      <div id="pct-display">
+        <span id="pct-value">0</span><span class="pct-sign">%</span>
+        <div class="pct-label">GREEN DETECTED</div>
+      </div>
+
+      <!-- Bottom bar -->
+      <div class="hud-bottom">
+        <div id="object-id" class="obj-tag">OBJECT IDENTIFIED</div>
+        <button id="stop-btn" onclick="stopScanner()">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+            <rect x="6" y="6" width="12" height="12" rx="1" stroke="#00FF00" stroke-width="2"/>
+          </svg>
+          STOP
+        </button>
+      </div>
+    </div>
+
+    <!-- ERROR STATE -->
+    <div id="error-screen" class="hidden">
+      <div class="error-inner">
+        <div class="error-icon">
+          <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg" width="60" height="60">
+            <circle cx="30" cy="30" r="28" stroke="#FF3300" stroke-width="2"/>
+            <line x1="20" y1="20" x2="40" y2="40" stroke="#FF3300" stroke-width="2"/>
+            <line x1="40" y1="20" x2="20" y2="40" stroke="#FF3300" stroke-width="2"/>
+          </svg>
+        </div>
+        <h2>CAMERA ACCESS<br>DENIED</h2>
+        <p id="error-msg">Camera permission is required to use the Green Scanner. Please allow camera access in your browser settings and reload the page.</p>
+        <button class="err-btn" onclick="location.reload()">RETRY</button>
+      </div>
+    </div>
+
+  </div><!-- /#app -->
+
+  <script src="app.js"></script>
+</body>
+</html>
