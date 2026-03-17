@@ -11,7 +11,30 @@
 </head>
 <body>
 
-  <!-- DESKTOP BLOCK -->
+  <!-- PASSWORD GATE (shown to everyone until authenticated) -->
+  <div id="auth-gate">
+    <div class="auth-grid"></div>
+    <div class="auth-inner">
+      <div class="auth-bottle">
+        <svg viewBox="0 0 60 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M26 0 L26 8 C18 10 14 18 14 26 L14 100 C14 108 20 114 28 114 L32 114 C40 114 46 108 46 100 L46 26 C46 18 42 10 34 8 L34 0 Z" stroke="#00FF00" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+      <div class="auth-title">ACCESS REQUIRED</div>
+      <div class="auth-subtitle">ENTER CLEARANCE CODE</div>
+      <div class="auth-input-wrap" id="auth-input-wrap">
+        <span class="auth-prompt">▶</span>
+        <input type="password" id="auth-input" autocomplete="off" spellcheck="false"
+               placeholder="••••••••••••••••"
+               onkeydown="if(event.key==='Enter')submitAuth()" />
+      </div>
+      <div id="auth-error"></div>
+      <button id="auth-btn" onclick="submitAuth()">AUTHENTICATE</button>
+      <div class="auth-footer">GRN_SCAN v2.1 — RESTRICTED ACCESS</div>
+    </div>
+  </div>
+
+  <!-- DESKTOP BLOCK (shown after auth on desktop) -->
   <div id="desktop-block">
     <div class="desktop-inner">
       <div class="desktop-icon">
@@ -21,7 +44,15 @@
       </div>
       <h1>GREEN FINDER</h1>
       <p>This experience is designed for mobile devices only.</p>
-      <p>Open this page on your smartphone to start scanning.</p>
+      <p>Scan the QR code to open it on your smartphone.</p>
+      <div class="qr-code-wrap">
+        <img
+          src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=https%3A%2F%2Fvittoriocafiero-git.github.io%2Fgreen-scanner&color=00FF00&bgcolor=000000&margin=6"
+          alt="QR Code — Green Finder"
+          class="qr-img"
+          width="160" height="160"
+        />
+      </div>
       <div class="qr-hint">
         <span class="blink">[ MOBILE ONLY ]</span>
       </div>

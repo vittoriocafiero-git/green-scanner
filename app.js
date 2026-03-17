@@ -6,6 +6,58 @@
 
 'use strict';
 
+// ── Auth ──────────────────────────────────────────────────
+// SHA-256 of the access password (plain text never stored).
+const AUTH_HASH = 'c9cff395d0f7cd2b92fdffb7002b7fe07b303c8df557cf4547a1720e26924202';
+const AUTH_KEY  = 'grn_auth';
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest(
+    'SHA-256', new TextEncoder().encode(str)
+  );
+  return Array.from(new Uint8Array(buf))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+async function submitAuth() {
+  const input = document.getElementById('auth-input');
+  const wrap  = document.getElementById('auth-input-wrap');
+  const err   = document.getElementById('auth-error');
+  const hash  = await sha256(input.value);
+
+  if (hash === AUTH_HASH) {
+    sessionStorage.setItem(AUTH_KEY, '1');
+    const gate = document.getElementById('auth-gate');
+    gate.classList.add('auth-success');
+    setTimeout(() => gate.classList.add('hidden'), 500);
+  } else {
+    wrap.classList.add('shake');
+    err.textContent = '— ACCESS DENIED —';
+    input.value = '';
+    input.focus();
+    setTimeout(() => {
+      wrap.classList.remove('shake');
+      err.textContent = '';
+    }, 1000);
+  }
+}
+
+function checkAuth() {
+  if (sessionStorage.getItem(AUTH_KEY) === '1') {
+    document.getElementById('auth-gate').classList.add('hidden');
+  } else {
+    // Ensure gate is visible and focus the input
+    setTimeout(() => {
+      const input = document.getElementById('auth-input');
+      if (input) input.focus();
+    }, 100);
+  }
+}
+
+// Expose globally (called from onclick attributes)
+window.submitAuth = submitAuth;
+
 // ── State ────────────────────────────────────────────────
 let stream        = null;
 let animFrame     = null;
@@ -286,6 +338,9 @@ function handleResize() {
 
 // ── Init ──────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  // Auth gate — check before anything else
+  checkAuth();
+
   video              = document.getElementById('video');
   offscreen          = document.getElementById('offscreen');
   ctx                = offscreen.getContext('2d', { willReadFrequently: true });
