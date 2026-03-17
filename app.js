@@ -8,7 +8,7 @@
 
 // ── Auth ──────────────────────────────────────────────────
 // SHA-256 of the access password (plain text never stored).
-const AUTH_HASH = 'c9cff395d0f7cd2b92fdffb7002b7fe07b303c8df557cf4547a1720e26924202';
+const AUTH_HASH = 'fbff2e4f5b4d34fe62f56c27d7026de6f8f136a8a88a0c6e36b91e3640bdd36a';
 const AUTH_KEY  = 'grn_auth';
 
 async function sha256(str) {
